@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	// ErrInternal is general internal error.
 	ErrInternal = errors.New("internal error")
 )
 
