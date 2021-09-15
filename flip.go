@@ -24,11 +24,11 @@ type Option struct {
 // New to create new flip client with config.
 func New(option Option) *Client {
 	if option.Logger == nil {
-		option.Logger = DefaultLogger(LogError)
+		option.Logger = defaultLogger(LogError)
 	}
 
 	if option.Requester == nil {
-		option.Requester = DefaultRequester(&http.Client{
+		option.Requester = defaultRequester(&http.Client{
 			Timeout: 10 * time.Second,
 		}, option.Logger)
 	}
@@ -46,9 +46,9 @@ func NewDefault(secretKey string, env EnvironmentType) *Client {
 	return New(Option{
 		SecretKey: secretKey,
 		BaseURL:   envURL[env],
-		Requester: DefaultRequester(&http.Client{
+		Requester: defaultRequester(&http.Client{
 			Timeout: 10 * time.Second,
-		}, DefaultLogger(envLog[env])),
-		Logger: DefaultLogger(envLog[env]),
+		}, defaultLogger(envLog[env])),
+		Logger: defaultLogger(envLog[env]),
 	})
 }

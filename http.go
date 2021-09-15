@@ -22,8 +22,7 @@ type requester struct {
 	logger Logger
 }
 
-// DefaultRequester to create new http request client.
-func DefaultRequester(client *http.Client, logger Logger) *requester {
+func defaultRequester(client *http.Client, logger Logger) *requester {
 	return &requester{
 		client: client,
 		logger: logger,

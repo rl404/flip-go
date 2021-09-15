@@ -31,8 +31,7 @@ type logger struct {
 	level LogLevel
 }
 
-// DefaultLogger to create default logger.
-func DefaultLogger(level LogLevel) *logger {
+func defaultLogger(level LogLevel) *logger {
 	return &logger{
 		level: level,
 	}
