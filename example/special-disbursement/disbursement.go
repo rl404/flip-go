@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/google/uuid"
-	"github.com/rl404/flip-id"
+	"github.com/rl404/flip-go"
 )
 
 func main() {

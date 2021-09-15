@@ -1,4 +1,4 @@
-module github.com/rl404/flip-id
+module github.com/rl404/flip-go
 
 go 1.17
 
