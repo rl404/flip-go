@@ -4,7 +4,9 @@
 ![License: MIT](https://img.shields.io/github/license/rl404/flip-go.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/rl404/flip-go.svg)](https://pkg.go.dev/github.com/rl404/flip-go)
 
-_flip-go_ is unofficial API wrapper for [flip.id](https://flip.id).
+_flip-go_ is unofficial golang API wrapper for [flip.id](https://flip.id).
+
+For official documentation, go [here](https://docs.flip.id).
 
 ## Features
 
