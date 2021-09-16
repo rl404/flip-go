@@ -14,7 +14,7 @@ import (
 
 // Requester is http request interface.
 type Requester interface {
-	Call(ctx context.Context, method, url, secretKey string, header http.Header, request io.Reader, response interface{}) error
+	Call(ctx context.Context, method, url, secretKey string, header http.Header, request io.Reader, response interface{}) (statusCode int, err error)
 }
 
 type requester struct {
@@ -30,13 +30,13 @@ func defaultRequester(client *http.Client, logger Logger) *requester {
 }
 
 // Call to prepare request and execute.
-func (r *requester) Call(ctx context.Context, method, url, secretKey string, header http.Header, request io.Reader, response interface{}) (err error) {
+func (r *requester) Call(ctx context.Context, method, url, secretKey string, header http.Header, request io.Reader, response interface{}) (int, error) {
 	now := time.Now()
 
 	req, err := http.NewRequestWithContext(ctx, method, url, request)
 	if err != nil {
 		r.logger.Error(err.Error())
-		return ErrInternal
+		return http.StatusInternalServerError, ErrInternal
 	}
 
 	if header != nil {
@@ -55,6 +55,12 @@ func (r *requester) Call(ctx context.Context, method, url, secretKey string, hea
 	return r.doRequest(req, response)
 }
 
+type errGeneralResponse struct {
+	Status  int    `json:"status"`
+	Name    string `json:"name"`
+	Message string `json:"message"`
+}
+
 type errResponse struct {
 	Code   string              `json:"code"`
 	Errors []errResponseDetail `json:"errors"`
@@ -66,37 +72,48 @@ type errResponseDetail struct {
 	Message   string `json:"message"`
 }
 
-func (r *requester) doRequest(req *http.Request, response interface{}) error {
+func (r *requester) doRequest(req *http.Request, response interface{}) (int, error) {
 	resp, err := r.client.Do(req)
 	if err != nil {
 		r.logger.Error(err.Error())
-		return ErrInternal
+		return http.StatusInternalServerError, ErrInternal
 	}
 	defer resp.Body.Close()
 
 	respBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		r.logger.Error(err.Error())
-		return ErrInternal
+		return http.StatusInternalServerError, ErrInternal
 	}
 
 	r.logResponseBody(resp.StatusCode, respBody)
 
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusIMUsed {
+		// Flip error response is a bit weird and not consistent.
+
+		// Try parse to general error response first.
+		var errGenResp errGeneralResponse
+		if err := json.Unmarshal(respBody, &errGenResp); err != nil {
+			r.logger.Error(err.Error())
+		} else {
+			return resp.StatusCode, errors.New(errGenResp.Message)
+		}
+
+		// Parse to error response with inner code.
 		var errResp errResponse
 		if err := json.Unmarshal(respBody, &errResp); err != nil {
 			r.logger.Error(err.Error())
-			return ErrInternal
+			return http.StatusInternalServerError, ErrInternal
 		}
-		return errors.New(errResp.Code)
+		return resp.StatusCode, errors.New(errResp.Errors[0].Message)
 	}
 
 	if err := json.Unmarshal(respBody, &response); err != nil {
 		r.logger.Error(err.Error())
-		return ErrInternal
+		return http.StatusInternalServerError, ErrInternal
 	}
 
-	return nil
+	return resp.StatusCode, nil
 }
 
 func (r *requester) logRequestHeader(header http.Header) {
@@ -136,5 +153,5 @@ func (r *requester) logResponseBody(code int, response []byte) {
 		return
 	}
 
-	r.logger.Debug("response: %d %s", code, string(out.Bytes()))
+	r.logger.Debug("response: %d %s", code, out.String())
 }
