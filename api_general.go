@@ -12,14 +12,14 @@ type Balance struct {
 }
 
 // GetBalance to get account balance.
-func (c *Client) GetBalance() (*Balance, error) {
+func (c *Client) GetBalance() (*Balance, int, error) {
 	return c.GetBalanceWithContext(context.Background())
 }
 
 // GetBalanceWithContext to get account balance with context.
-func (c *Client) GetBalanceWithContext(ctx context.Context) (*Balance, error) {
+func (c *Client) GetBalanceWithContext(ctx context.Context) (*Balance, int, error) {
 	var response Balance
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/general/balance", c.baseURL),
@@ -29,9 +29,9 @@ func (c *Client) GetBalanceWithContext(ctx context.Context) (*Balance, error) {
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
-	return &response, nil
+	return &response, code, nil
 }
 
 // Bank is response model from get banks.
@@ -44,19 +44,19 @@ type Bank struct {
 }
 
 // GetBanks to get list of bank info.
-func (c *Client) GetBanks(bankCode ...string) ([]Bank, error) {
+func (c *Client) GetBanks(bankCode ...string) ([]Bank, int, error) {
 	return c.GetBanksWithContext(context.Background(), bankCode...)
 }
 
 // GetBanksWithContext to get list of bank info with context.
-func (c *Client) GetBanksWithContext(ctx context.Context, bankCode ...string) ([]Bank, error) {
+func (c *Client) GetBanksWithContext(ctx context.Context, bankCode ...string) ([]Bank, int, error) {
 	var queryString string
 	if len(bankCode) > 0 {
 		queryString = fmt.Sprintf("?code=%s", bankCode[0])
 	}
 
 	var response []Bank
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/general/banks%s", c.baseURL, queryString),
@@ -66,10 +66,10 @@ func (c *Client) GetBanksWithContext(ctx context.Context, bankCode ...string) ([
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
 
-	return response, nil
+	return response, code, nil
 }
 
 // Maintenance is response model from is maintenance.
@@ -78,14 +78,14 @@ type Maintenance struct {
 }
 
 // IsMaintenance to get flip maintenance status.
-func (c *Client) IsMaintenance() (*Maintenance, error) {
+func (c *Client) IsMaintenance() (*Maintenance, int, error) {
 	return c.IsMaintenanceWithContext(context.Background())
 }
 
 // IsMaintenanceWithContext to get flip maintenance status with context.
-func (c *Client) IsMaintenanceWithContext(ctx context.Context) (*Maintenance, error) {
+func (c *Client) IsMaintenanceWithContext(ctx context.Context) (*Maintenance, int, error) {
 	var response Maintenance
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/general/maintenance", c.baseURL),
@@ -95,9 +95,9 @@ func (c *Client) IsMaintenanceWithContext(ctx context.Context) (*Maintenance, er
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
-	return &response, nil
+	return &response, code, nil
 }
 
 // BankAccount is response model from inquiry bank account.
@@ -109,18 +109,18 @@ type BankAccount struct {
 }
 
 // InquiryBankAccount to inquiry bank account.
-func (c *Client) InquiryBankAccount(request InquiryBankAccountRequest) (*BankAccount, error) {
+func (c *Client) InquiryBankAccount(request InquiryBankAccountRequest) (*BankAccount, int, error) {
 	return c.InquiryBankAccountWithContext(context.Background(), request)
 }
 
 // InquiryBankAccountWithContext to inquiry bank account with context.
-func (c *Client) InquiryBankAccountWithContext(ctx context.Context, request InquiryBankAccountRequest) (*BankAccount, error) {
+func (c *Client) InquiryBankAccountWithContext(ctx context.Context, request InquiryBankAccountRequest) (*BankAccount, int, error) {
 	if err := validate(&request); err != nil {
-		return nil, err
+		return nil, http.StatusBadRequest, err
 	}
 
 	var response BankAccount
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("%s/disbursement/bank-account-inquiry", c.baseURL),
@@ -130,24 +130,24 @@ func (c *Client) InquiryBankAccountWithContext(ctx context.Context, request Inqu
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
 
-	return &response, nil
+	return &response, code, nil
 }
 
 // City is response model for city.
 type City map[int]string
 
 // GetCities to get city list
-func (c *Client) GetCities() (*City, error) {
+func (c *Client) GetCities() (*City, int, error) {
 	return c.GetCitiesWithContext(context.Background())
 }
 
 // GetCitiesWithContext to get city list with context.
-func (c *Client) GetCitiesWithContext(ctx context.Context) (*City, error) {
+func (c *Client) GetCitiesWithContext(ctx context.Context) (*City, int, error) {
 	var response City
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/disbursement/city-list", c.baseURL),
@@ -157,23 +157,23 @@ func (c *Client) GetCitiesWithContext(ctx context.Context) (*City, error) {
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
-	return &response, nil
+	return &response, code, nil
 }
 
 // Country is response model for country.
 type Country map[int]string
 
 // GetCountries to get country list
-func (c *Client) GetCountries() (*Country, error) {
+func (c *Client) GetCountries() (*Country, int, error) {
 	return c.GetCountriesWithContext(context.Background())
 }
 
 // GetCountriesWithContext to get country list with context.
-func (c *Client) GetCountriesWithContext(ctx context.Context) (*Country, error) {
+func (c *Client) GetCountriesWithContext(ctx context.Context) (*Country, int, error) {
 	var response Country
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/disbursement/country-list", c.baseURL),
@@ -183,23 +183,23 @@ func (c *Client) GetCountriesWithContext(ctx context.Context) (*Country, error) 
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
-	return &response, nil
+	return &response, code, nil
 }
 
 // CityCountry is response model for city and country.
 type CityCountry map[int]string
 
 // GetCitiesCountries to get city and country list
-func (c *Client) GetCitiesCountries() (*CityCountry, error) {
+func (c *Client) GetCitiesCountries() (*CityCountry, int, error) {
 	return c.GetCitiesCountriesWithContext(context.Background())
 }
 
 // GetCitiesCountriesWithContext to get city and country list with context.
-func (c *Client) GetCitiesCountriesWithContext(ctx context.Context) (*CityCountry, error) {
+func (c *Client) GetCitiesCountriesWithContext(ctx context.Context) (*CityCountry, int, error) {
 	var response CityCountry
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/disbursement/city-country-list", c.baseURL),
@@ -209,7 +209,7 @@ func (c *Client) GetCitiesCountriesWithContext(ctx context.Context) (*CityCountr
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
-	return &response, nil
+	return &response, code, nil
 }

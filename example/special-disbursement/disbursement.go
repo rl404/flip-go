@@ -12,7 +12,7 @@ func main() {
 
 	f := flip.NewDefault(secretKey, flip.Sandbox)
 
-	tx, err := f.CreateSpecialDisbursement(flip.CreateSpecialDisbursementRequest{
+	tx, code, err := f.CreateSpecialDisbursement(flip.CreateSpecialDisbursementRequest{
 		IdempotencyKey:       uuid.New().String(),
 		AccountNumber:        "5465327020",
 		BankCode:             "bca",
@@ -30,9 +30,9 @@ func main() {
 		Direction:            flip.DirectionDomestic,
 	})
 	if err != nil {
-		log.Println(err)
+		log.Println(code, err)
 		return
 	}
 
-	log.Println(tx)
+	log.Println(code, tx)
 }

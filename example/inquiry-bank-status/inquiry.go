@@ -11,14 +11,14 @@ func main() {
 
 	f := flip.NewDefault(secretKey, flip.Sandbox)
 
-	bank, err := f.InquiryBankAccount(flip.InquiryBankAccountRequest{
+	bank, code, err := f.InquiryBankAccount(flip.InquiryBankAccountRequest{
 		AccountNumber: "5465327020",
 		BankCode:      "bca",
 	})
 	if err != nil {
-		log.Println(err)
+		log.Println(code, err)
 		return
 	}
 
-	log.Println(bank)
+	log.Println(code, bank)
 }

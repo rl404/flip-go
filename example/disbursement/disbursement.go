@@ -12,7 +12,7 @@ func main() {
 
 	f := flip.NewDefault(secretKey, flip.Sandbox)
 
-	tx, err := f.CreateDisbursement(flip.CreateDisbursementRequest{
+	tx, code, err := f.CreateDisbursement(flip.CreateDisbursementRequest{
 		IdempotencyKey: uuid.New().String(),
 		AccountNumber:  "5465327020",
 		BankCode:       "bca",
@@ -21,28 +21,28 @@ func main() {
 		RecipientCity:  391,
 	})
 	if err != nil {
-		log.Println(err)
+		log.Println(code, err)
 		return
 	}
 
-	log.Println(tx)
+	log.Println(code, tx)
 
-	tx, err = f.GetDisbursement(tx.ID)
+	tx, code, err = f.GetDisbursement(tx.ID)
 	if err != nil {
-		log.Println(err)
+		log.Println(code, err)
 		return
 	}
 
-	log.Println(tx)
+	log.Println(code, tx)
 
-	txs, err := f.GetDisbursements(flip.GetDisbursementsRequest{
+	txs, code, err := f.GetDisbursements(flip.GetDisbursementsRequest{
 		Pagination: 10,
 		Page:       1,
 	})
 	if err != nil {
-		log.Println(err)
+		log.Println(code, err)
 		return
 	}
 
-	log.Println(txs)
+	log.Println(code, txs)
 }

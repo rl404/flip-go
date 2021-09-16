@@ -41,21 +41,21 @@ type Sender struct {
 }
 
 // CreateDisbursement to create disbursement.
-func (c *Client) CreateDisbursement(request CreateDisbursementRequest) (*Disbursement, error) {
+func (c *Client) CreateDisbursement(request CreateDisbursementRequest) (*Disbursement, int, error) {
 	return c.CreateDisbursementWithContext(context.Background(), request)
 }
 
 // CreateDisbursementWithContext to create disbursement with context.
-func (c *Client) CreateDisbursementWithContext(ctx context.Context, request CreateDisbursementRequest) (*Disbursement, error) {
+func (c *Client) CreateDisbursementWithContext(ctx context.Context, request CreateDisbursementRequest) (*Disbursement, int, error) {
 	if err := validate(&request); err != nil {
-		return nil, err
+		return nil, http.StatusBadRequest, err
 	}
 
 	header := make(http.Header)
 	header.Add("idempotency-key", request.IdempotencyKey)
 
 	var response Disbursement
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodPost,
 		fmt.Sprintf("%s/disbursement", c.baseURL),
@@ -65,25 +65,25 @@ func (c *Client) CreateDisbursementWithContext(ctx context.Context, request Crea
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
 
-	return &response, nil
+	return &response, code, nil
 }
 
 // GetDisbursement to get disbursement by id.
-func (c *Client) GetDisbursement(id int) (*Disbursement, error) {
+func (c *Client) GetDisbursement(id int) (*Disbursement, int, error) {
 	return c.GetDisbursementWithContext(context.Background(), id)
 }
 
 // GetDisbursementWithContext to get disbursement by id with context.
-func (c *Client) GetDisbursementWithContext(ctx context.Context, id int) (*Disbursement, error) {
+func (c *Client) GetDisbursementWithContext(ctx context.Context, id int) (*Disbursement, int, error) {
 	if err := validate(&getDisbursementRequest{ID: id}); err != nil {
-		return nil, err
+		return nil, http.StatusBadRequest, err
 	}
 
 	var response Disbursement
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/disbursement/%d", c.baseURL, id),
@@ -93,10 +93,10 @@ func (c *Client) GetDisbursementWithContext(ctx context.Context, id int) (*Disbu
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
 
-	return &response, nil
+	return &response, code, nil
 }
 
 // Disbursements is disbursement pagination response model.
@@ -109,18 +109,18 @@ type Disbursements struct {
 }
 
 // GetDisbursements to get disbursement list.
-func (c *Client) GetDisbursements(request GetDisbursementsRequest) (*Disbursements, error) {
+func (c *Client) GetDisbursements(request GetDisbursementsRequest) (*Disbursements, int, error) {
 	return c.GetDisbursementsWithContext(context.Background(), request)
 }
 
 // GetDisbursementsWithContext to get disbursement list with context.
-func (c *Client) GetDisbursementsWithContext(ctx context.Context, request GetDisbursementsRequest) (*Disbursements, error) {
+func (c *Client) GetDisbursementsWithContext(ctx context.Context, request GetDisbursementsRequest) (*Disbursements, int, error) {
 	if err := validate(&request); err != nil {
-		return nil, err
+		return nil, http.StatusBadRequest, err
 	}
 
 	var response Disbursements
-	err := c.requester.Call(
+	code, err := c.requester.Call(
 		ctx,
 		http.MethodGet,
 		fmt.Sprintf("%s/disbursement?%s", c.baseURL, request.encode()),
@@ -130,8 +130,8 @@ func (c *Client) GetDisbursementsWithContext(ctx context.Context, request GetDis
 		&response,
 	)
 	if err != nil {
-		return nil, err
+		return nil, code, err
 	}
 
-	return &response, nil
+	return &response, code, nil
 }
