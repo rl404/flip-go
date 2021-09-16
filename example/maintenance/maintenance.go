@@ -11,11 +11,11 @@ func main() {
 
 	f := flip.NewDefault(secretKey, flip.Sandbox)
 
-	maintenance, err := f.IsMaintenance()
+	maintenance, code, err := f.IsMaintenance()
 	if err != nil {
-		log.Println(err)
+		log.Println(code, err)
 		return
 	}
 
-	log.Println(maintenance)
+	log.Println(code, maintenance)
 }

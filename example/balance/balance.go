@@ -11,11 +11,11 @@ func main() {
 
 	f := flip.NewDefault(secretKey, flip.Sandbox)
 
-	balance, err := f.GetBalance()
+	balance, code, err := f.GetBalance()
 	if err != nil {
-		log.Println(err)
+		log.Println(code, err)
 		return
 	}
 
-	log.Println(balance)
+	log.Println(code, balance)
 }

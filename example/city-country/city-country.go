@@ -11,11 +11,11 @@ func main() {
 
 	f := flip.NewDefault(secretKey, flip.Sandbox)
 
-	data, err := f.GetCitiesCountries()
+	data, code, err := f.GetCitiesCountries()
 	if err != nil {
-		log.Println(err)
+		log.Println(code, err)
 		return
 	}
 
-	log.Println(data)
+	log.Println(code, data)
 }
