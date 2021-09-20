@@ -27,7 +27,7 @@ func (c *Client) CreateSpecialDisbursementWithContext(ctx context.Context, reque
 		fmt.Sprintf("%s/special-disbursement", c.baseURL),
 		c.secretKey,
 		header,
-		request.encode(),
+		[]byte(request.encode()),
 		&response,
 	)
 	if err != nil {

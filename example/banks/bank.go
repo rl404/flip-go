@@ -11,7 +11,7 @@ func main() {
 
 	f := flip.NewDefault(secretKey, flip.Sandbox)
 
-	banks, code, err := f.GetBanks("mandiri")
+	banks, code, err := f.GetBanks(flip.BankAceh)
 	if err != nil {
 		log.Println(code, err)
 		return
