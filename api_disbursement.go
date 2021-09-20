@@ -61,7 +61,7 @@ func (c *Client) CreateDisbursementWithContext(ctx context.Context, request Crea
 		fmt.Sprintf("%s/disbursement", c.baseURL),
 		c.secretKey,
 		header,
-		request.encode(),
+		[]byte(request.encode()),
 		&response,
 	)
 	if err != nil {

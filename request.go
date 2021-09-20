@@ -2,36 +2,38 @@ package flip
 
 import (
 	"fmt"
-	"io"
 	"net/url"
 	"strconv"
-	"strings"
 )
+
+type getBanksRequest struct {
+	BankCode BankCode `validate:"bank_code" mod:"no_space"`
+}
 
 // InquiryBankAccountRequest is request model for inquiry bank account.
 type InquiryBankAccountRequest struct {
-	AccountNumber string   `validate:"required" mod:"no_space"`
-	BankCode      BankCode `validate:"required" mod:"no_space"`
+	AccountNumber string   `validate:"required,numeric" mod:"no_space"`
+	BankCode      BankCode `validate:"required,bank_code" mod:"no_space"`
 }
 
-func (i *InquiryBankAccountRequest) encode() io.Reader {
+func (i *InquiryBankAccountRequest) encode() string {
 	data := url.Values{}
 	data.Set("account_number", i.AccountNumber)
 	data.Set("bank_code", string(i.BankCode))
-	return strings.NewReader(data.Encode())
+	return data.Encode()
 }
 
 // CreateDisbursementRequest is request model to create disbursement.
 type CreateDisbursementRequest struct {
 	IdempotencyKey string   `validate:"required"`
-	AccountNumber  string   `validate:"required"`
-	BankCode       BankCode `validate:"required"`
+	AccountNumber  string   `validate:"required,numeric" mod:"no_space"`
+	BankCode       BankCode `validate:"required,bank_code" mod:"no_space"`
 	Amount         float64  `validate:"required,gt=0"`
-	Remark         string   `validate:"max=18"`
-	RecipientCity  int      // from GetCities()
+	Remark         string   `validate:"max=18" mod:"trim"`
+	RecipientCity  int      `validate:"gte=0"` // from GetCities()
 }
 
-func (c *CreateDisbursementRequest) encode() io.Reader {
+func (c *CreateDisbursementRequest) encode() string {
 	data := url.Values{}
 	data.Set("account_number", c.AccountNumber)
 	data.Set("bank_code", string(c.BankCode))
@@ -45,7 +47,7 @@ func (c *CreateDisbursementRequest) encode() io.Reader {
 		data.Set("recipient_city", strconv.Itoa(c.RecipientCity))
 	}
 
-	return strings.NewReader(data.Encode())
+	return data.Encode()
 }
 
 type getDisbursementRequest struct {
@@ -127,14 +129,14 @@ func (g *GetDisbursementsRequest) encode() string {
 // CreateSpecialDisbursementRequest is request model to create special disbursement.
 type CreateSpecialDisbursementRequest struct {
 	IdempotencyKey       string       `validate:"required"`
-	AccountNumber        string       `validate:"required"`
-	BankCode             BankCode     `validate:"required"`
+	AccountNumber        string       `validate:"required,numeric" mod:"no_space"`
+	BankCode             BankCode     `validate:"required,bank_code" mod:"no_space"`
 	Amount               float64      `validate:"required,gt=0"`
-	Remark               string       ``
-	RecipientCity        int          ``                    // from GetCities()
-	SenderCountry        int          `validate:"required"` // from GetCountries()
-	SenderPlaceOfBirth   int          ``                    // from GetCities()
-	SenderDateOfBirth    string       ``                    // yyyy-mm-dd
+	Remark               string       `validate:"max=18" mod:"trim"`
+	RecipientCity        int          `validate:"gte=0"`         // from GetCities()
+	SenderCountry        int          `validate:"required,gt=0"` // from GetCountries()
+	SenderPlaceOfBirth   int          `validate:"gte=0"`         // from GetCities()
+	SenderDateOfBirth    string       ``                         // yyyy-mm-dd
 	SenderIdentityType   IdentityType ``
 	SenderName           string       `validate:"required"`
 	SenderAddress        string       `validate:"required"`
@@ -143,7 +145,7 @@ type CreateSpecialDisbursementRequest struct {
 	Direction            Direction    `validate:"required"`
 }
 
-func (c *CreateSpecialDisbursementRequest) encode() io.Reader {
+func (c *CreateSpecialDisbursementRequest) encode() string {
 	data := url.Values{}
 	data.Set("account_number", c.AccountNumber)
 	data.Set("bank_code", string(c.BankCode))
@@ -173,5 +175,5 @@ func (c *CreateSpecialDisbursementRequest) encode() io.Reader {
 		data.Set("sender_identity_number", c.SenderIdentityNumber)
 	}
 
-	return strings.NewReader(data.Encode())
+	return data.Encode()
 }

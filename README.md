@@ -39,10 +39,13 @@ import (
 )
 
 func main() {
+	// Prepare API key.
 	secretKey := "abc123"
 
+	// Create flip client.
 	f := flip.NewDefault(secretKey, flip.Sandbox)
 
+	// Get your flip's account balance.
 	balance, code, err := f.GetBalance()
 	if err != nil {
 		log.Println(code, err)

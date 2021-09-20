@@ -44,14 +44,17 @@ type Bank struct {
 }
 
 // GetBanks to get list of bank info.
-func (c *Client) GetBanks(bankCode ...string) ([]Bank, int, error) {
+func (c *Client) GetBanks(bankCode ...BankCode) ([]Bank, int, error) {
 	return c.GetBanksWithContext(context.Background(), bankCode...)
 }
 
 // GetBanksWithContext to get list of bank info with context.
-func (c *Client) GetBanksWithContext(ctx context.Context, bankCode ...string) ([]Bank, int, error) {
+func (c *Client) GetBanksWithContext(ctx context.Context, bankCode ...BankCode) ([]Bank, int, error) {
 	var queryString string
 	if len(bankCode) > 0 {
+		if err := validate(&getBanksRequest{BankCode: bankCode[0]}); err != nil {
+			return nil, http.StatusBadRequest, err
+		}
 		queryString = fmt.Sprintf("?code=%s", bankCode[0])
 	}
 
@@ -126,7 +129,7 @@ func (c *Client) InquiryBankAccountWithContext(ctx context.Context, request Inqu
 		fmt.Sprintf("%s/disbursement/bank-account-inquiry", c.baseURL),
 		c.secretKey,
 		nil,
-		request.encode(),
+		[]byte(request.encode()),
 		&response,
 	)
 	if err != nil {
