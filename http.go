@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -14,7 +13,7 @@ import (
 
 // Requester is http request interface.
 type Requester interface {
-	Call(ctx context.Context, method, url, secretKey string, header http.Header, request io.Reader, response interface{}) (statusCode int, err error)
+	Call(ctx context.Context, method, url, secretKey string, header http.Header, request []byte, response interface{}) (statusCode int, err error)
 }
 
 type requester struct {
@@ -30,10 +29,10 @@ func defaultRequester(client *http.Client, logger Logger) *requester {
 }
 
 // Call to prepare request and execute.
-func (r *requester) Call(ctx context.Context, method, url, secretKey string, header http.Header, request io.Reader, response interface{}) (int, error) {
+func (r *requester) Call(ctx context.Context, method, url, secretKey string, header http.Header, request []byte, response interface{}) (int, error) {
 	now := time.Now()
 
-	req, err := http.NewRequestWithContext(ctx, method, url, request)
+	req, err := http.NewRequestWithContext(ctx, method, url, strings.NewReader(string(request)))
 	if err != nil {
 		r.logger.Error(err.Error())
 		return http.StatusInternalServerError, ErrInternal
@@ -86,17 +85,16 @@ func (r *requester) doRequest(req *http.Request, response interface{}) (int, err
 		return http.StatusInternalServerError, ErrInternal
 	}
 
+	// Flip error response is a bit weird and not consistent.
 	r.logResponseBody(resp.StatusCode, respBody)
 
 	if resp.StatusCode < http.StatusOK || resp.StatusCode > http.StatusIMUsed {
-		// Flip error response is a bit weird and not consistent.
-
 		// Try parse to general error response first.
 		var errGenResp errGeneralResponse
-		if err := json.Unmarshal(respBody, &errGenResp); err != nil {
-			r.logger.Error(err.Error())
-		} else {
-			return resp.StatusCode, errors.New(errGenResp.Message)
+		if json.Unmarshal(respBody, &errGenResp) == nil {
+			if errGenResp.Status != 0 {
+				return resp.StatusCode, errors.New(errGenResp.Message)
+			}
 		}
 
 		// Parse to error response with inner code.
@@ -128,17 +126,11 @@ func (r *requester) logRequestHeader(header http.Header) {
 	}
 }
 
-func (r *requester) logRequestBody(request io.Reader) {
+func (r *requester) logRequestBody(request []byte) {
 	if request == nil {
 		return
 	}
-
-	var sb strings.Builder
-	if _, err := io.Copy(&sb, request); err != nil {
-		return
-	}
-
-	r.logger.Debug("request: %s", sb.String())
+	r.logger.Debug("request: %s", string(request))
 }
 
 func (r *requester) logResponseBody(code int, response []byte) {

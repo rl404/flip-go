@@ -27,7 +27,7 @@ func main() {
 		SenderAddress:        "konohagakure",
 		SenderIdentityNumber: "123456",
 		SenderJob:            flip.JobFoundationBoard,
-		Direction:            flip.DirectionDomestic,
+		Direction:            flip.DirectionDomesticSpecial,
 	})
 	if err != nil {
 		log.Println(code, err)
