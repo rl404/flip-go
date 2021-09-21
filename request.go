@@ -1,7 +1,6 @@
 package flip
 
 import (
-	"fmt"
 	"net/url"
 	"strconv"
 )
@@ -37,7 +36,7 @@ func (c *CreateDisbursementRequest) encode() string {
 	data := url.Values{}
 	data.Set("account_number", c.AccountNumber)
 	data.Set("bank_code", string(c.BankCode))
-	data.Set("amount", fmt.Sprintf("%g", c.Amount))
+	data.Set("amount", strconv.FormatFloat(c.Amount, 'f', -1, 64))
 
 	if c.Remark != "" {
 		data.Set("remark", c.Remark)
@@ -93,7 +92,7 @@ func (g *GetDisbursementsRequest) encode() string {
 		query.Add("id", strconv.Itoa(g.ID))
 	}
 	if g.Amount > 0 {
-		query.Add("amount", fmt.Sprintf("%g", g.Amount))
+		query.Add("amount", strconv.FormatFloat(g.Amount, 'f', -1, 64))
 	}
 	if g.Status != "" {
 		query.Add("status", string(g.Status))
@@ -149,7 +148,7 @@ func (c *CreateSpecialDisbursementRequest) encode() string {
 	data := url.Values{}
 	data.Set("account_number", c.AccountNumber)
 	data.Set("bank_code", string(c.BankCode))
-	data.Set("amount", fmt.Sprintf("%g", c.Amount))
+	data.Set("amount", strconv.FormatFloat(c.Amount, 'f', -1, 64))
 	data.Set("sender_country", strconv.Itoa(c.SenderCountry))
 	data.Set("sender_name", c.SenderName)
 	data.Set("sender_address", c.SenderAddress)
