@@ -3,7 +3,7 @@ module github.com/rl404/flip-go
 go 1.17
 
 require (
-	github.com/go-playground/mold/v4 v4.2.1
+	github.com/go-playground/mold/v4 v4.3.0
 	github.com/go-playground/validator/v10 v10.11.2
 	github.com/google/uuid v1.3.0
 )
