@@ -1,6 +1,5 @@
 # Flip-go
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/rl404/flip-go)](https://goreportcard.com/report/github.com/rl404/flip-go)
 ![License: MIT](https://img.shields.io/github/license/rl404/flip-go.svg)
 [![Go Reference](https://pkg.go.dev/badge/github.com/rl404/flip-go.svg)](https://pkg.go.dev/github.com/rl404/flip-go)
 
@@ -23,7 +22,7 @@ For official documentation, go [here](https://docs.flip.id).
 
 ## Installation
 
-```
+```sh
 go get github.com/rl404/flip-go
 ```
 
@@ -33,30 +32,30 @@ go get github.com/rl404/flip-go
 package main
 
 import (
-	"log"
+    "log"
 
-	"github.com/rl404/flip-go"
+    "github.com/rl404/flip-go"
 )
 
 func main() {
-	// Prepare API key.
-	secretKey := "abc123"
+    // Prepare API key.
+    secretKey := "abc123"
 
-	// Create flip client.
-	f := flip.NewDefault(secretKey, flip.Sandbox)
+    // Create flip client.
+    f := flip.NewDefault(secretKey, flip.Sandbox)
 
-	// Get your flip's account balance.
-	balance, code, err := f.GetBalance()
-	if err != nil {
-		log.Println(code, err)
-		return
-	}
+    // Get your flip's account balance.
+    balance, code, err := f.GetBalance()
+    if err != nil {
+        log.Println(code, err)
+        return
+    }
 
-	log.Println(code, balance)
+    log.Println(code, balance)
 }
 ```
 
-*For more detail config and usage, please go to the [documentation](https://pkg.go.dev/github.com/rl404/flip-go).*
+_For more detail config and usage, please go to the [documentation](https://pkg.go.dev/github.com/rl404/flip-go)._
 
 ## License
 

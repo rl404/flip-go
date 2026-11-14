@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -79,7 +79,7 @@ func (r *requester) doRequest(req *http.Request, response interface{}) (int, err
 	}
 	defer resp.Body.Close()
 
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		r.logger.Error(err.Error())
 		return http.StatusInternalServerError, ErrInternal
